@@ -1,0 +1,65 @@
+version : "3.8"
+
+services:
+  web:
+    depends_on:
+      - api
+    build : ./client
+    volumes:
+      - dist:/app/dist
+    develop:
+        watch:
+          - path: ./client/package.json
+            action: rebuild
+          - path: ./client/package-lock.json
+            action: rebuild
+          - path: ./client/
+            target: /app
+            action: sync
+          - path: ./server/sql/
+            action: rebuild
+
+  api:
+    depends_on:
+      - db 
+        #  condition: service_healthy
+    build : ./server
+    environment:
+      #      postgresql://postgres:postgres@postgres/postgres?sslmode=disable
+
+      DATABASE_URL: postgresql://postgres:postgres@db/mydb?sslmode=disable
+        #"host=db user=postgres password=postgres dbname=postgres sslmode=disable"
+    ports:
+      - 8080:8080
+    volumes:
+        - ./server:/app
+        #  - ./client/dist/:/app/static
+        - images:/app/images/
+        - dist:/app/static
+    develop:
+      watch:
+        - path: ./client/dist/
+          target: /app/static
+          action:  sync
+  db:
+    image: postgres:alpine
+    restart : always
+    environment : 
+     - POSTGRES_PASSWORD=postgres
+     - PGUSER=postgres
+     - POSTGRES_DB=mydb
+    expose:
+      - 5432:5432
+    # healthcheck:
+    #
+    #       test: [ "CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}" ]
+
+    volumes:
+      - pgdata:/var/lib/postgresql/data 
+
+
+volumes:
+  pgdata:
+  images:
+  dist:
+

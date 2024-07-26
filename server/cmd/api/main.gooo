@@ -1,0 +1,42 @@
+package main
+
+import (
+	"database/sql"
+	"fmt"
+	"net/http"
+
+	log "github.com/sirupsen/logrus"
+	"embed"
+
+    "github.com/pressly/goose/v3"
+
+	"server/internal/handlers"
+)
+
+func wellcomeHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+
+	println(r.Body)
+	w.Write([]byte("hhi"))
+}
+
+//go:embed migrations/*.sql
+var embedMigrations embed.FS
+func main() {
+	dbUrl:="postgresql://root:newpassword@localhost/example"
+	db ,err :=sql.Open("postgres ",dbUrl)
+	if err!=nil{
+    log.Fatal("db connection failed ")
+	}
+	var mux http.ServeMux = *http.NewServeMux()
+	mux.HandleFunc("/work", wellcomeHandler)
+	log.SetReportCaller(true)
+	mux.HandleFunc("/upload", handlers.Upload)
+	mux.HandleFunc("/", handlers.ServecFiles)
+	fmt.Print("server  at on port 8080")
+
+	err := http.ListenAndServe(":8080", &mux)
+	if err != nil {
+		log.Error(err)
+	}
+}
