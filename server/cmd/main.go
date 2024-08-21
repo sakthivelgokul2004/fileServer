@@ -9,18 +9,14 @@ import (
 
 	_ "github.com/lib/pq"
 	"github.com/pressly/goose/v3"
+
 	log "github.com/sirupsen/logrus"
 
+	"server/internal/database"
 	"server/internal/handlers"
+	"server/internal/middleware"
 	sqlFs "server/sql"
 )
-
-func wellcomeHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-
-	println(r.Body)
-	w.Write([]byte("hhi"))
-}
 
 var embedMigrations embed.FS = sqlFs.EmbedMigrations
 
@@ -40,12 +36,30 @@ func main() {
 	if err := goose.Up(db, "schema"); err != nil {
 		panic(err)
 	}
-	var mux http.ServeMux = *http.NewServeMux()
-	mux.HandleFunc("/work", wellcomeHandler)
+	dbConfig := handlers.DBConfig{
+		DB: database.New(db),
+	}
+	dbcontex := middleware.DBContex{
+		DB: database.New(db),
+	}
+
+	router := http.NewServeMux()
+	// router.HandleFunc("/work", handlers.WellcomeHandler)
 	log.SetReportCaller(true)
-	mux.HandleFunc("/upload", handlers.Upload)
-	mux.HandleFunc("/", handlers.ServecFiles)
+	router.HandleFunc("/", handlers.ServecFiles)
 	fmt.Print("server  at on port 8080")
 
-	http.ListenAndServe(":8080", &mux)
+	authRouter := http.NewServeMux()
+	authRouter.HandleFunc("POST /signup", dbConfig.SignupHandler)
+	authRouter.HandleFunc("POST /login", dbConfig.LoginHandler)
+	router.Handle("/auth/", http.StripPrefix("/auth", middleware.Logging(authRouter)))
+	authcatedRouter := http.NewServeMux()
+	authcatedRouter.HandleFunc("/upload", handlers.Upload)
+	router.Handle("/user/", http.StripPrefix("/user", dbcontex.AuthMiddleware(authcatedRouter)))
+	server := http.Server{
+		Addr:    ":8080",
+		Handler: router,
+	}
+
+	server.ListenAndServe()
 }

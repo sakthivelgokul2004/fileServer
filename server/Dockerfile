@@ -5,11 +5,10 @@ WORKDIR /app
 RUN go install github.com/air-verse/air@latest
 RUN go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
 COPY go.mod go.sum ./
+COPY .   .
 
-COPY . .
-RUN go mod download
-#COPY .air.toml .
-RUN sqlc generate
+#RUN go mod tidy
+#RUN go mod vendor
 
-CMD ["air", "-c", ".air.toml"]
-#CMD ["bash"]
+CMD  air -c .air.toml
+

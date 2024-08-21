@@ -1,0 +1,22 @@
+
+  const refs = useRef<HTMLFormElement>(null);
+
+  const inputref = useRef<HTMLInputElement>(null);
+  function news(e: React.FormEvent<HTMLFormElement>) {
+    if (inputref.current?.files != null) {
+      const file = inputref.current?.files[0]
+      console.log(file)
+      const form = new FormData()
+      form.append("image", file)
+      fetch("http://localhost:8080/upload", {
+        method: "POST",
+        body: form
+      }
+      )
+    }
+    e.preventDefault()
+  }
+      <form ref={refs} onSubmit={news}>
+        <input type="file" id="image" name="image" ref={inputref} />
+        <button type="submit" onClick={() => (console.log("hi"))}>summit</button>
+      </form>

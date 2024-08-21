@@ -1,35 +1,25 @@
+import { AuthContexProvider } from './contex/AuthContex';
+import { Home } from './page/home';
 
-import React, { useRef } from "react"
+
 function App() {
-  const refs = useRef<HTMLFormElement>(null);
-
-  const inputref = useRef<HTMLInputElement>(null);
-  function news(e: React.FormEvent<HTMLFormElement>) {
-    console.log("NOTU")
-    if (inputref.current?.files != null) {
-      const file =inputref.current?.files[0]
-      console.log(file)
-      const form = new FormData()
-      form.append("image",file)
-      fetch("http://localhost:8080/upload", {
-        method: "POST",
-        body: form
-      }
-      )
-    }
-    console.log("HI")
-    e.preventDefault()
-  }
-//  {//encType="multipart/form-data" method="POST" action="http://localhost:8080/upload" id="image" ref={refs} >}
   return (
-    <>
-    <h5>hi</h5>
-      <form ref={refs} onSubmit={news}>
-        <input type="file" id="image" name="image"ref={inputref} />
-        <button type="submit" onClick={() => (console.log("hi"))}>summit</button>
-      </form>
-    </>
+    <div className="h-screen w-screen  bg-bg">
+      <div className="w-[108] flex justify-end flex-none overflow-hidden">
+        <div className="z-0  top-0 flex    absolute">
+          <picture className="">
+            <source srcSet="./d.png"></source>
+            <img src="/d.png" className="   w-[90rem] max-w-none flex-none   " />
+          </picture>
+        </div>
+      </div>
+      <AuthContexProvider>
+      <Home />
+      </AuthContexProvider>
+    </div>
+
+
   )
 }
 
-export default App
+export default App                
