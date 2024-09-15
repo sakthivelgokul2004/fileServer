@@ -5,11 +5,17 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 
 	"server/internal/auth"
 )
+
+type userResponse struct {
+	UserEmail string `json:"Email"`
+	Time      int64  `json:"time"`
+}
 
 func (DBConfig *DBConfig) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	usrParam := userRequestParam{}
@@ -46,6 +52,11 @@ func (DBConfig *DBConfig) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
 	})
+	reponse := userResponse{
+		UserEmail: user.Email,
+		Time:      time.Now().Add(time.Hour * 24 * 30).Unix(),
+	}
+
 	// to create response with userEmail and userId
-	RespondWithJson(w, http.StatusCreated, jwtToken)
+	RespondWithJson(w, http.StatusCreated, reponse)
 }

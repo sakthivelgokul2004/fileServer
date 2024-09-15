@@ -1,21 +1,21 @@
-version : "3.8"
+# version : "3.8"
 
 services:
   web:
     depends_on:
       - api
     build : ./client
-    volumes:
-      - dist:/app/dist
     develop:
         watch:
           - path: ./client/package.json
             action: rebuild
           - path: ./client/package-lock.json
             action: rebuild
-          - path: ./client/
+          - path: ./client
             target: /app
             action: sync
+    ports:
+      - 5173:5173
   api:
     depends_on:
       - db 
@@ -26,22 +26,19 @@ services:
 
       DATABASE_URL: postgresql://postgres:postgres@db/mydb?sslmode=disable
       SECRET: test
-        #"host=db user=postgres password=postgres dbname=postgres sslmode=disable"
+      GOOGLE_APPLICATION_CREDENTIALS: /app/config/serviceAccountKey.json 
     ports:
       - 8080:8080
     volumes:
         # - ./server:/app
         #  - ./client/dist/:/app/static
         - images:/app/images/
-        - dist:/app/static
+        - ./server/fileserver-8c567-firebase-adminsdk-6k8mq-a3eefe8827.json:/app/config/serviceAccountKey.json 
     develop:
       watch:
         - path: ./server/
           target: /app
           action: sync
-        - path: ./client/dist/
-          target: /app/static
-          action:  sync
         - path: ./server/sql/
           action: rebuild
         - path: ./server/go.mod
@@ -62,5 +59,4 @@ services:
 volumes:
   pgdata:
   images:
-  dist:
 

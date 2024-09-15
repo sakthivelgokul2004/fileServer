@@ -20,7 +20,6 @@ type DBContex struct {
 
 func (DBcontex DBContex) AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Print("logiing")
 		cookie, err := r.Cookie("Authorization")
 		if err != nil {
 			handlers.RespondWithError(w, http.StatusUnauthorized, "Unauthorized  access")
@@ -50,7 +49,7 @@ func (DBcontex DBContex) AuthMiddleware(next http.Handler) http.Handler {
 					handlers.RespondWithError(w, http.StatusUnauthorized, "User does not exsit")
 				}
 				ctx := context.WithValue(r.Context(), "user", user)
-             r.WithContext(ctx)
+				r.WithContext(ctx)
 			}
 		} else {
 			handlers.RespondWithError(w, http.StatusUnauthorized, "Unauthorized  access")

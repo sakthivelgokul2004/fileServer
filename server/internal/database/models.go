@@ -10,6 +10,13 @@ import (
 	"github.com/google/uuid"
 )
 
+type File struct {
+	Userid   uuid.UUID
+	Fileurl  string
+	Typefile string
+	ID       uuid.UUID
+}
+
 type User struct {
 	ID        uuid.UUID
 	CreatedAt time.Time

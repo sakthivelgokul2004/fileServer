@@ -20,8 +20,9 @@ export default {
       'gray': '#8492a6',
       'gray-light': '#d3dce6',
       'eample':'#1e293b',
-      'inputbg':'#142942'
+      'inputbg':'#142942',
+      'link':'#0ea5e9'
     },
   },
-  plugins: [],
+  plugins: [require('daisyui'),],
 }
