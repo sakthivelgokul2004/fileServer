@@ -15,6 +15,7 @@ import (
 type userResponse struct {
 	UserEmail string `json:"Email"`
 	Time      int64  `json:"time"`
+	Token     string `json:"token"`
 }
 
 func (DBConfig *DBConfig) LoginHandler(w http.ResponseWriter, r *http.Request) {
@@ -25,6 +26,7 @@ func (DBConfig *DBConfig) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		RespondWithError(w, http.StatusBadRequest, "invaild request")
 		return
 	}
+	fmt.Println(r.Cookies())
 
 	user, err := DBConfig.DB.GetUserByEmail(r.Context(), usrParam.Email)
 	if err != nil {
@@ -41,19 +43,21 @@ func (DBConfig *DBConfig) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		RespondWithError(w, http.StatusBadRequest, " can't genrate token")
 		return
 	}
+	fmt.Print("gsjksljglsglksg")
 
 	http.SetCookie(w, &http.Cookie{
 		Name:     "Authorization",
 		Value:    jwtToken,
-		Path:     "/",
-		Domain:   "",
 		MaxAge:   3600 * 24 * 30,
-		Secure:   true,
+		Domain:   "localhost",
+		Path:     "/",
+		Secure:   false,
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
 	})
 	reponse := userResponse{
 		UserEmail: user.Email,
+		Token:     jwtToken,
 		Time:      time.Now().Add(time.Hour * 24 * 30).Unix(),
 	}
 

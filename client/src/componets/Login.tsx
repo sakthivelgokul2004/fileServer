@@ -1,14 +1,42 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import { useAuthContex } from "../contex/AuthContex";
+import { useMutation } from "@tanstack/react-query";
 
 interface login {
   refElement: React.Ref<HTMLDivElement>;
 }
 
+interface requset {
+  email: string;
+  password: string;
+}
+const login = (data: requset) => {
+  return fetch("/api/auth/login", {
+    method: "POST",
+    body: JSON.stringify(data),
+  }).then((res) => res.json());
+};
+const signIn = (data: requset) => {
+  return fetch("/api/auth/signup", {
+    method: "POST",
+    body: JSON.stringify(data),
+  }).then((res) => res.json());
+};
 export const Login = (props: login) => {
   const style =
     "  h-screen w-1/2 bg-bg absolute  top-0 right-0 bg-opacity-90 overflow-hidden   backdrop:blur";
+  const mutaion = useMutation({
+    mutationKey: ["login"],
+    mutationFn: (reqest: requset) => login(reqest),
+  });
+  const SignInMutaion = useMutation({
+    mutationKey: ["signup"],
+    mutationFn: (reqest: requset) => signIn(reqest),
+    onSuccess(data, variables, context) {
+      console.log(data, variables, context);
+    },
+  });
   const [formData, setformData] = useState({ Email: "", Password: "" });
   const [formState, setformState] = useState(false);
   const auth = useAuthContex();
@@ -23,35 +51,31 @@ export const Login = (props: login) => {
   };
   const onSubmitForm = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const url = formState ? "/auth/signup" : "/auth/login";
-    console.log(formData);
-    const requset = {
+    const requset: requset = {
       email: formData.Email,
       password: formData.Password,
     };
-    try {
-      fetch("http://localhost:8080" + url, {
-        method: "POST",
-        body: JSON.stringify(requset),
-      })
-        .then((res) => {
-          toast("login succesful", {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "dark",
-            // transition: Bounce,
-          });
-          auth?.setAuthstate(true);
-          console.log(res);
-        })
-        .catch((err) => console.log(err));
-    } catch (error) {
-      console.log(error);
+    if (!formState) {
+      console.log(formState);
+      mutaion.mutate(requset);
+    } else {
+      SignInMutaion.mutate(requset);
+    }
+    if (mutaion.isSuccess) {
+      toast("login succesful", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
+      auth?.setAuthstate(true);
+      if (formState == false) {
+        localStorage.setItem("user", JSON.stringify(mutaion.data));
+      }
     }
   };
   return (
@@ -93,6 +117,7 @@ export const Login = (props: login) => {
             {formState ? "Sign Up" : "Login In"}
           </button>
           <button
+            type="button"
             className="tx-sm  font-semibold leading-6 text-link mt-8"
             onClick={() => setformState(!formState)}
           >

@@ -23,16 +23,15 @@ func (DBConfig *DBConfig) Addfile(w http.ResponseWriter, r *http.Request) {
 		RespondWithError(w, http.StatusBadRequest, "invaild request")
 		return
 	}
-	dbParams := database.AddImageUrlParams{
+	dbParams := database.AddFileUrlParams{
 		Userid:   user.ID,
 		Fileurl:  fileparm.Fileurl,
 		Typefile: fileparm.Filetype,
 		ID:       uuid.New(),
 	}
-	file, errer := DBConfig.DB.AddImageUrl(r.Context(), dbParams)
+	file, errer := DBConfig.DB.AddFileUrl(r.Context(), dbParams)
 	if errer != nil {
 		RespondWithError(w, http.StatusNotAcceptable, "not vaild")
 	}
 	RespondWithJson(w, http.StatusOK, file)
-	w.Write([]byte("hi"))
 }

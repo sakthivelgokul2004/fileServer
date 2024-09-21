@@ -35,8 +35,9 @@ export default function Upload() {
             request.urlString = downloadUrl;
             console.log(downloadUrl);
           });
-          await fetch("http://localhost:8080/user/addfile", {
+          await fetch("/api/user/addfile", {
             method: "POST",
+            credentials: "same-origin",
             body: JSON.stringify(request),
           });
         }

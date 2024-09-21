@@ -11,21 +11,21 @@ import (
 	"github.com/google/uuid"
 )
 
-const addImageUrl = `-- name: AddImageUrl :one
+const addFileUrl = `-- name: AddFileUrl :one
 INSERT INTO files(userId,fileUrl , typeFile, id )
 VALUES ($1, $2, $3, $4)
 RETURNING userid, fileurl, typefile, id
 `
 
-type AddImageUrlParams struct {
+type AddFileUrlParams struct {
 	Userid   uuid.UUID
 	Fileurl  string
 	Typefile string
 	ID       uuid.UUID
 }
 
-func (q *Queries) AddImageUrl(ctx context.Context, arg AddImageUrlParams) (File, error) {
-	row := q.db.QueryRowContext(ctx, addImageUrl,
+func (q *Queries) AddFileUrl(ctx context.Context, arg AddFileUrlParams) (File, error) {
+	row := q.db.QueryRowContext(ctx, addFileUrl,
 		arg.Userid,
 		arg.Fileurl,
 		arg.Typefile,

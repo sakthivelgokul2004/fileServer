@@ -1,6 +1,16 @@
 # version : "3.8"
 
 services:
+  ngnix:
+    depends_on:
+      - web
+      - api
+    image: nginx:latest
+    container_name: nginx_container
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - 80:80
   web:
     depends_on:
       - api

@@ -1,12 +1,14 @@
 import React from "react";
 import { IconContext } from "react-icons";
 import { PiUploadSimpleLight } from "react-icons/pi";
+import Upload from "./upload";
+import DynamicButton from "./dynamicButton";
 
-interface login {
-  login: React.MouseEventHandler<HTMLButtonElement> | undefined;
+interface loginProps {
+  logout: React.MouseEventHandler<HTMLButtonElement>;
+  login: React.MouseEventHandler<HTMLButtonElement>;
 }
-
-export default function Navbar(login: login) {
+const Navbar: React.FC<loginProps> = ({ login, logout }) => {
   return (
     <nav>
       <div className="top-0 backdrop-blur -z-0 w-full border-b border-boder ">
@@ -18,13 +20,12 @@ export default function Navbar(login: login) {
               </IconContext.Provider>
               <h5 className="text-text-hed">Filestore</h5>
             </div>
-            <button className="ml-auto text-text-hed" onClick={login.login}>
-              {" "}
-              Sign In
-            </button>
+            <Upload />
+            <DynamicButton logout={logout} login={login} />
           </div>
         </div>
       </div>
     </nav>
   );
-}
+};
+export default Navbar;

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"database/sql"
 	"embed"
 	"fmt"
@@ -12,9 +11,11 @@ import (
 	"server/internal/middleware"
 	sqlFs "server/sql"
 
-	firebase "firebase.google.com/go/v4"
+	// firebase "firebase.google.com/go"
 	_ "github.com/lib/pq"
 	"github.com/pressly/goose/v3"
+
+	// "github.com/rs/cors"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -43,47 +44,53 @@ func main() {
 	dbcontex := middleware.DBContex{
 		DB: database.New(db),
 	}
-	config := &firebase.Config{
-		StorageBucket: "fileserver-8c567.appspot.com",
-	}
-	app, err := firebase.NewApp(context.Background(), config)
-	if err != nil {
-		log.Fatalf("error initializing app: %v\n", err)
-	}
-	Storage, err := app.Storage(context.Background())
-	if err != nil {
-		log.Fatalln(err)
-	}
-	bucket, err := Storage.DefaultBucket()
-	if err != nil {
-		log.Fatalln(err)
-	}
+	//
+	// config := &firebase.Config{
+	// StorageBucket: "fileserver-8c567.appspot.com",
+	// }
+	// app, err := firebase.NewApp(context.Background(), config)
+	// if err != nil {
+	// log.Fatalf("error initializing app: %v\n", err)
+	// }
+	// Storage, err := app.Storage(context.Background())
+	// if err != nil {
+	// log.Fatalln(err)
+	// }
+	// bucket, err := Storage.DefaultBucket()
+	// if err != nil {
+	// log.Fatalln(err)
+	// }
 	// it := bucket.Objects(context.Background(), nil)
 	// arrs, err := it.Next()
-	// arr, err := it.Next()
-	// bucket.Object(arr.Name).Delete(context.Background())
-	obj := bucket.Object("images.jpeg")
-
-	fmt.Println(obj.BucketName())
-	if err != nil {
-		log.Fatalf("error listing objects: %v\n", err)
-	}
+	// if err != nil {
+	// log.Fatalf("error listing objects: %v\n", err)
+	// }
 	// fmt.Println(arrs.Name, arrs.ContentType)
 	router := http.NewServeMux()
-	log.SetReportCaller(true)
-	fmt.Print("server  at on port 8080")
+	// fmt.Print("server  at on port 8080")
 	authRouter := http.NewServeMux()
 	authRouter.HandleFunc("POST /signup", dbConfig.SignupHandler)
+	authRouter.HandleFunc("GET /getfile", dbConfig.GetFileUrl)
 	authRouter.HandleFunc("POST /login", dbConfig.LoginHandler)
 	router.Handle("/auth/", http.StripPrefix("/auth", middleware.Logging(authRouter)))
 	authcatedRouter := http.NewServeMux()
 	authcatedRouter.HandleFunc("/upload", handlers.Upload)
 	authcatedRouter.HandleFunc("POST /addfile", dbConfig.Addfile)
+	authcatedRouter.HandleFunc("GET /getfile", dbConfig.GetFileUrl)
 	router.Handle("/user/", http.StripPrefix("/user", dbcontex.AuthMiddleware(authcatedRouter)))
+	// corsHandler := cors.New(cors.Options{
+	// 	AllowedOrigins:     []string{"http://localhost:8080", "http://localhost:5173"}, // Allow all origins
+	// 	AllowedMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+	// 	OptionsPassthrough: true,
+	// 	ExposedHeaders:     []string{"Authorization"},
+	// 	MaxAge:             86400,
+	// })
 	server := http.Server{
-		Addr:    ":8080",
-		Handler: middleware.CorsMiddleware(router),
+		Addr: ":8080",
+		// Handler: corsHandler.Handler(router),
+		Handler: router,
 	}
 
+	fmt.Println("gdog")
 	server.ListenAndServe()
 }
