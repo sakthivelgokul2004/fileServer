@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -19,10 +18,8 @@ func GenJwt(id uuid.UUID) (string, error) {
 
 	tokenSring, err := token.SignedString([]byte(os.Getenv("SECRET")))
 	if err != nil {
-		fmt.Println("erros")
 		log.Panicf("error %v", err)
 		return "", err
 	}
 	return tokenSring, err
 }
-

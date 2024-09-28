@@ -12,15 +12,16 @@ import (
 )
 
 const addFileUrl = `-- name: AddFileUrl :one
-INSERT INTO files(userId,fileUrl , typeFile, id )
-VALUES ($1, $2, $3, $4)
-RETURNING userid, fileurl, typefile, id
+INSERT INTO files(userId,fileUrl , typeFile, fileName, id )
+VALUES ($1, $2, $3, $4,$5)
+RETURNING userid, filename, fileurl, typefile, id
 `
 
 type AddFileUrlParams struct {
 	Userid   uuid.UUID
 	Fileurl  string
 	Typefile string
+	Filename string
 	ID       uuid.UUID
 }
 
@@ -29,11 +30,13 @@ func (q *Queries) AddFileUrl(ctx context.Context, arg AddFileUrlParams) (File, e
 		arg.Userid,
 		arg.Fileurl,
 		arg.Typefile,
+		arg.Filename,
 		arg.ID,
 	)
 	var i File
 	err := row.Scan(
 		&i.Userid,
+		&i.Filename,
 		&i.Fileurl,
 		&i.Typefile,
 		&i.ID,
@@ -42,7 +45,7 @@ func (q *Queries) AddFileUrl(ctx context.Context, arg AddFileUrlParams) (File, e
 }
 
 const getFileByUserId = `-- name: GetFileByUserId :many
-SELECT userid, fileurl, typefile, id FROM files WHERE userId = $1
+SELECT userid, filename, fileurl, typefile, id FROM files WHERE userId = $1
 `
 
 func (q *Queries) GetFileByUserId(ctx context.Context, userid uuid.UUID) ([]File, error) {
@@ -56,6 +59,7 @@ func (q *Queries) GetFileByUserId(ctx context.Context, userid uuid.UUID) ([]File
 		var i File
 		if err := rows.Scan(
 			&i.Userid,
+			&i.Filename,
 			&i.Fileurl,
 			&i.Typefile,
 			&i.ID,

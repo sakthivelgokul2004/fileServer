@@ -26,24 +26,22 @@ func (DBConfig *DBConfig) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		RespondWithError(w, http.StatusBadRequest, "invaild request")
 		return
 	}
-	fmt.Println(r.Cookies())
 
 	user, err := DBConfig.DB.GetUserByEmail(r.Context(), usrParam.Email)
 	if err != nil {
 		log.Println("can't find user")
 		RespondWithError(w, 401, "does not exsit")
 	}
-	fmt.Println(user.Password, usrParam.Password)
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(usrParam.Password))
 	if err != nil {
 		RespondWithError(w, 401, "incorrect password")
 	}
+	fmt.Println(user.ID)
 	jwtToken, err := auth.GenJwt(user.ID)
 	if err != nil {
 		RespondWithError(w, http.StatusBadRequest, " can't genrate token")
 		return
 	}
-	fmt.Print("gsjksljglsglksg")
 
 	http.SetCookie(w, &http.Cookie{
 		Name:     "Authorization",

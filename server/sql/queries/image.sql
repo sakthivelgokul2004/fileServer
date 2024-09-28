@@ -1,7 +1,7 @@
 
 -- name: AddFileUrl :one
-INSERT INTO files(userId,fileUrl , typeFile, id )
-VALUES ($1, $2, $3, $4)
+INSERT INTO files(userId,fileUrl , typeFile, fileName, id )
+VALUES ($1, $2, $3, $4,$5)
 RETURNING *;
 
 -- name: GetFileByUserId :many 

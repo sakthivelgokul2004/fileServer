@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -38,13 +37,6 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	// Print out details for debugging
-   fmt.Println("Handler:", handler.Filename)
-   fmt.Println("Size:", handler.Size)
-   fmt.Println("MIME:", handler.Header.Get("Content-Type"))
-
-	// You can save the file to disk or process it as needed
-	// Example: Saving the file to a local directory
 	destination, err := os.Create("./images/" + handler.Filename)
 	if err != nil {
 		http.Error(w, "Error saving file", http.StatusInternalServerError)

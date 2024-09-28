@@ -1,9 +1,9 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"embed"
-	"fmt"
 	"net/http"
 	"os"
 	"server/internal/database"
@@ -12,6 +12,7 @@ import (
 	sqlFs "server/sql"
 
 	// firebase "firebase.google.com/go"
+	firebase "firebase.google.com/go"
 	_ "github.com/lib/pq"
 	"github.com/pressly/goose/v3"
 
@@ -38,36 +39,31 @@ func main() {
 	if err := goose.Up(db, "schema"); err != nil {
 		panic(err)
 	}
+	config := &firebase.Config{
+		StorageBucket: "fileserver-8c567.appspot.com",
+	}
+
+	app, err := firebase.NewApp(context.Background(), config)
+	if err != nil {
+		log.Fatalf("error initializing app: %v\n", err)
+	}
+	Storage, err := app.Storage(context.Background())
+	if err != nil {
+		log.Fatalln(err)
+	}
+	//  bucket, err := Storage.DefaultBucket()
+	//  if err != nil {
+	//  	log.Fatalln(err)
+	//  }
+
 	dbConfig := handlers.DBConfig{
-		DB: database.New(db),
+		DB:        database.New(db),
+		Filestore: Storage,
 	}
 	dbcontex := middleware.DBContex{
 		DB: database.New(db),
 	}
-	//
-	// config := &firebase.Config{
-	// StorageBucket: "fileserver-8c567.appspot.com",
-	// }
-	// app, err := firebase.NewApp(context.Background(), config)
-	// if err != nil {
-	// log.Fatalf("error initializing app: %v\n", err)
-	// }
-	// Storage, err := app.Storage(context.Background())
-	// if err != nil {
-	// log.Fatalln(err)
-	// }
-	// bucket, err := Storage.DefaultBucket()
-	// if err != nil {
-	// log.Fatalln(err)
-	// }
-	// it := bucket.Objects(context.Background(), nil)
-	// arrs, err := it.Next()
-	// if err != nil {
-	// log.Fatalf("error listing objects: %v\n", err)
-	// }
-	// fmt.Println(arrs.Name, arrs.ContentType)
 	router := http.NewServeMux()
-	// fmt.Print("server  at on port 8080")
 	authRouter := http.NewServeMux()
 	authRouter.HandleFunc("POST /signup", dbConfig.SignupHandler)
 	authRouter.HandleFunc("GET /getfile", dbConfig.GetFileUrl)
@@ -78,19 +74,11 @@ func main() {
 	authcatedRouter.HandleFunc("POST /addfile", dbConfig.Addfile)
 	authcatedRouter.HandleFunc("GET /getfile", dbConfig.GetFileUrl)
 	router.Handle("/user/", http.StripPrefix("/user", dbcontex.AuthMiddleware(authcatedRouter)))
-	// corsHandler := cors.New(cors.Options{
-	// 	AllowedOrigins:     []string{"http://localhost:8080", "http://localhost:5173"}, // Allow all origins
-	// 	AllowedMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-	// 	OptionsPassthrough: true,
-	// 	ExposedHeaders:     []string{"Authorization"},
-	// 	MaxAge:             86400,
-	// })
 	server := http.Server{
 		Addr: ":8080",
 		// Handler: corsHandler.Handler(router),
 		Handler: router,
 	}
 
-	fmt.Println("gdog")
 	server.ListenAndServe()
 }

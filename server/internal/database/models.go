@@ -12,6 +12,7 @@ import (
 
 type File struct {
 	Userid   uuid.UUID
+	Filename string
 	Fileurl  string
 	Typefile string
 	ID       uuid.UUID

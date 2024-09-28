@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"firebase.google.com/go/storage"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 
@@ -12,7 +13,8 @@ import (
 )
 
 type DBConfig struct {
-	DB *database.Queries
+	DB        *database.Queries
+	Filestore *storage.Client
 }
 
 type userRequestParam struct {
@@ -31,7 +33,7 @@ func (DBconfig *DBConfig) SignupHandler(w http.ResponseWriter, r *http.Request) 
 	hash, err := bcrypt.GenerateFromPassword([]byte(usr.Password), 10)
 	if err != nil {
 		RespondWithError(w, 500, "can't genrate hash")
-   }
+	}
 
 	params := database.CreateUserParams{
 		ID:        uuid.New(),

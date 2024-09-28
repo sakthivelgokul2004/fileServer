@@ -17,8 +17,9 @@ export default function Upload() {
       const storageRef = ref(storage, img.name);
       const uploadTask = uploadBytesResumable(storageRef, img);
       let request = {
-        urlString: "",
+        fileurl: "",
         filetype: img.type,
+        filename: "",
       };
       console.log(img.name);
       uploadTask.on(
@@ -31,13 +32,13 @@ export default function Upload() {
         },
         (error) => {},
         async () => {
-          await getDownloadURL(uploadTask.snapshot.ref).then((downloadUrl) => {
-            request.urlString = downloadUrl;
-            console.log(downloadUrl);
-          });
+          let downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
+          request.fileurl = downloadUrl;
+          request.filename = img.name;
+          console.log(downloadUrl);
           await fetch("/api/user/addfile", {
             method: "POST",
-            credentials: "same-origin",
+            credentials: "include",
             body: JSON.stringify(request),
           });
         }

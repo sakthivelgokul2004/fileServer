@@ -20,7 +20,9 @@ const Navbar: React.FC<loginProps> = ({ login, logout }) => {
               </IconContext.Provider>
               <h5 className="text-text-hed">Filestore</h5>
             </div>
-            <Upload />
+            <div className="">
+              <Upload />
+            </div>
             <DynamicButton logout={logout} login={login} />
           </div>
         </div>

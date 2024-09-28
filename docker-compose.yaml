@@ -24,8 +24,6 @@ services:
           - path: ./client
             target: /app
             action: sync
-    ports:
-      - 5173:5173
   api:
     depends_on:
       - db 
@@ -37,11 +35,7 @@ services:
       DATABASE_URL: postgresql://postgres:postgres@db/mydb?sslmode=disable
       SECRET: test
       GOOGLE_APPLICATION_CREDENTIALS: /app/config/serviceAccountKey.json 
-    ports:
-      - 8080:8080
     volumes:
-        # - ./server:/app
-        #  - ./client/dist/:/app/static
         - images:/app/images/
         - ./server/fileserver-8c567-firebase-adminsdk-6k8mq-a3eefe8827.json:/app/config/serviceAccountKey.json 
     develop:
