@@ -8,7 +8,6 @@ RUN npm i
 
 COPY . .
 
-# VOLUME /app/dist
 
 EXPOSE 5173
 

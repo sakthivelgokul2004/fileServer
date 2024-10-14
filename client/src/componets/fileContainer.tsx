@@ -5,7 +5,7 @@ interface data {
   fileUrl: string;
   fileType: string;
   fileName: string;
-  fileId: string;
+  id: any;
 }
 
 const getfile = async () => {
@@ -31,11 +31,11 @@ const FileContainer = () => {
         data.map((data) => {
           return (
             <FilesList
-              key={data.fileId}
+              key={data.id}
               fileName={data.fileName}
               fileUrl={data.fileUrl}
               download={downloadFile}
-              id={data.fileId}
+              id={data.id}
             />
           );
         })}

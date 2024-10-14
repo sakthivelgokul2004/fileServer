@@ -1,11 +1,16 @@
 package types
 
-import "server/internal/database"
+import (
+	"server/internal/database"
+
+	"github.com/google/uuid"
+)
 
 type FileResponse struct {
-	Fileurl  string `json:"fileUrl"`
-	Typefile string `json:"fileType"`
-	Filename string `json:"fileName"`
+	Fileurl  string    `json:"fileUrl"`
+	Typefile string    `json:"fileType"`
+	Filename string    `json:"fileName"`
+	ID       uuid.UUID `json:"id"`
 }
 
 func ConvertFile(file database.File) FileResponse {
@@ -14,6 +19,7 @@ func ConvertFile(file database.File) FileResponse {
 		file.Fileurl,
 		file.Typefile,
 		file.Filename,
+		file.ID,
 	}
 }
 
@@ -25,6 +31,7 @@ func ConvertFileArray(files []database.File) []FileResponse {
 			files[i].Fileurl,
 			files[i].Typefile,
 			files[i].Filename,
+			files[i].ID,
 		}
 		Responsefiles = append(Responsefiles, file)
 	}

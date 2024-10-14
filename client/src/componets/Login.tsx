@@ -11,21 +11,22 @@ interface requset {
   email: string;
   password: string;
 }
-const login = (data: requset) => {
-  return fetch("/api/auth/login", {
+const login = async (data: requset) => {
+  const res = await fetch("/api/auth/login", {
     method: "POST",
     body: JSON.stringify(data),
-  }).then((res) => res.json());
+  });
+  return await res.json();
 };
-const signIn = (data: requset) => {
-  return fetch("/api/auth/signup", {
+const signIn = async (data: requset) => {
+  const res = await fetch("/api/auth/signup", {
     method: "POST",
     body: JSON.stringify(data),
-  }).then((res) => res.json());
+  });
+  return await res.json();
 };
 export const Login = (props: login) => {
-  const style =
-    "  h-screen w-1/2 bg-bg absolute  top-0 right-0 bg-opacity-90 overflow-hidden   backdrop:blur";
+  const style ="h-screen w-1/2 bg-bg absolute  top-0 right-0 bg-opacity-90 overflow-hidden   backdrop:blur";
   const mutaion = useMutation({
     mutationKey: ["login"],
     mutationFn: (reqest: requset) => login(reqest),

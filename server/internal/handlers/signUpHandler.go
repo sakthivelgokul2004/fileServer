@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"encoding/json"
 	"net/http"
 	"time"
@@ -15,6 +16,7 @@ import (
 type DBConfig struct {
 	DB        *database.Queries
 	Filestore *storage.Client
+	Db        *sql.DB
 }
 
 type userRequestParam struct {

@@ -26,6 +26,7 @@ func main() {
 
 	dbUrl := os.Getenv("DATABASE_URL")
 	db, err := sql.Open("postgres", dbUrl)
+
 	if err != nil {
 		log.Error(err)
 		log.Panicf("db connection failed %v", dbUrl)
@@ -59,6 +60,7 @@ func main() {
 	dbConfig := handlers.DBConfig{
 		DB:        database.New(db),
 		Filestore: Storage,
+		Db:        db,
 	}
 	dbcontex := middleware.DBContex{
 		DB: database.New(db),
@@ -73,6 +75,7 @@ func main() {
 	authcatedRouter.HandleFunc("/upload", handlers.Upload)
 	authcatedRouter.HandleFunc("POST /addfile", dbConfig.Addfile)
 	authcatedRouter.HandleFunc("GET /getfile", dbConfig.GetFileUrl)
+	authcatedRouter.HandleFunc("DELETE /delete", dbConfig.DeleteFile)
 	router.Handle("/user/", http.StripPrefix("/user", dbcontex.AuthMiddleware(authcatedRouter)))
 	server := http.Server{
 		Addr: ":8080",

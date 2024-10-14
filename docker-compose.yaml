@@ -37,7 +37,7 @@ services:
       GOOGLE_APPLICATION_CREDENTIALS: /app/config/serviceAccountKey.json 
     volumes:
         - images:/app/images/
-        - ./server/fileserver-8c567-firebase-adminsdk-6k8mq-a3eefe8827.json:/app/config/serviceAccountKey.json 
+        - ./server/fileserver-8c567-firebase-adminsdk-6k8mq-ffbcdb8af0.json:/app/config/serviceAccountKey.json 
     develop:
       watch:
         - path: ./server/

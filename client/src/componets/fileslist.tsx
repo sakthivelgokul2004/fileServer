@@ -11,10 +11,10 @@ interface file {
 }
 const delet = async (id: string) => {
   const requset = {
-    id: id,
+    fileid: id,
   };
-  let response = await fetch("/api/user/getfile", {
-    method: "POST",
+  let response = await fetch("/api/user/delete", {
+    method: "DELETE",
     body: JSON.stringify(requset),
   });
   return response.json;
